@@ -1,0 +1,62 @@
+FROM debian:buster-slim
+
+RUN apt-get update && apt-get install -y \
+	wget \
+        unzip \
+        make \
+        libfreetype6 \
+        libfreetype6-dev \
+        libgeos-dev \
+        libpng-dev \
+        libspatialindex-dev \
+        qt5-style-plugins \
+        python3-dev \
+        python3-gdal \
+        python3-pip \
+        python3-pyqt5 \
+        python3-pyqt5.qtopengl \
+        python3-simplejson \
+        python3-tk \
+        freeglut3-dev
+
+
+RUN ln -s /usr/lib/x86_64-linux-gnu/libxcb-util.so.0 /usr/lib/x86_64-linux-gnu/libxcb-util.so.1
+
+RUN wget https://bitbucket.org/jpcgt/flatcam/downloads/FlatCAM_beta_8.994_sources.zip && unzip FlatCAM_beta_8.994_sources.zip 
+RUN sed -i '/ezdxf.math.vector/c\from ezdxf.math import Vec3 as ezdxf_vector' FlatCAM_beta_8.994_sources/appParsers/ParseDXF.py
+
+RUN make -C FlatCAM_beta_8.994_sources install
+
+RUN pip3 install --upgrade pip && pip install --upgrade \
+        pip \
+        pyserial \
+        numpy \
+        shapely \
+        rtree \
+        tk \
+        lxml \
+        cycler \
+        python-dateutil \
+        kiwisolver \
+        dill \
+        vispy \
+        pyopengl \
+        setuptools \
+        svg.path \
+        ortools \
+        freetype-py \
+        fontTools \
+        rasterio \
+        ezdxf \
+        matplotlib \
+        qrcode \
+        pyqt5 \
+        reportlab \
+        svglib \
+        bCNC
+
+RUN useradd -ms /bin/bash --groups dialout cnc
+USER cnc
+WORKDIR /home/cnc
+
+CMD bash
